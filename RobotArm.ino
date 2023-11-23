@@ -10,9 +10,9 @@ Adafruit_PWMServoDriver pca= Adafruit_PWMServoDriver(0x40);
 Servo servos[3];
 int servoPins[3] = {5, 6, 7};
 
-double theta1 = 85.0;
+double theta1 = 85.0; // 85 most allign
 double theta2 = 85.0;
-double theta3 = 85.0; // 85 most alligh
+double theta3 = 85.0; 
 
 double theta1Prev = theta1;
 double theta2Prev = theta2;
@@ -21,7 +21,7 @@ double theta3Prev = theta3;
 //Constant for different parts of the robotArm
 float armLength = 92.5;
 
-float iP[3] = {20, 30, 0};
+float iP[3] = {150, 30, 0};
 float fP[3] = {150, -30, 0};
 
 
@@ -43,7 +43,7 @@ void setup() {
   servos[1].write(theta2);
   servos[2].write(theta3);
 
-  delay(500);
+  delay(800);
 }
 
 
@@ -53,32 +53,22 @@ void loop() {
 
 
   // MovingSmoothly2(iP, fP);
-  // Serial.println("hello");
 
-  // iP[0] = 150;
-  // iP[1] = -30;
-  // iP[2] = 0;
+  // iP[0] = fP[0];
+  // iP[1] = fP[1];
+  // iP[2] = fP[2];
 
 
-  // delay(1000);
+  drawParamatricEquation();
 
-  // MovingSmoothly(100, 0, 90);
 
-  // delay(1000);
+  // movingStraightLineWithPotentiometer();
 
-  movingStraightLine();
-  // movingTheArm(30, 0, 0);
-  // smoothMoveFromAToB(90, 120, 0);
-
-  // forwardKinematics(theta1, theta2, theta3);
-
-  // delay(1000);
 
   // movingTheArm(100, 0, 30);
 
-  // forwardKinematics(theta1, theta2, theta3);
 
-  // delay(1000);
+  // forwardKinematics(theta1, theta2, theta3);
 
 }
 
@@ -134,7 +124,7 @@ void movingTheArm(float x, float y, float z) {
 
 
 
-void movingStraightLine() {
+void movingStraightLineWithPotentiometer() {
   float potx = analogRead(A0);
   float poty = analogRead(A0);
   float potz = analogRead(A0);
@@ -166,14 +156,13 @@ void MovingSmoothly1(float x, float y, float z) {
 }
 
 
-
 void MovingSmoothly2(float initialPosition[3], float finalPosition[3]) {
 
   float x1 = initialPosition[0], y1 = initialPosition[1], z1 = initialPosition[2];
   float x2 = finalPosition[0], y2 = finalPosition[1], z2 = finalPosition[2];
 
   movingTheArm(x1, y1, z1); // set the postion to the initialPosition first
-  delay(500);
+  delay(1000);
 
   float ratioA = 0.0;
   float steps = 0.0;
@@ -188,7 +177,97 @@ void MovingSmoothly2(float initialPosition[3], float finalPosition[3]) {
     movingTheArm(vectorFromAToB[0], vectorFromAToB[1], vectorFromAToB[2]);
     Serial.println(vectorFromAToB[0]);
     ratioA = steps;
-    delay(10);
+    delay(20);
+    // if (ratioA > 0.5 - 0.01) { // bascially the ideas is for when a=0.5
+    //   delay(10000); // pause at the midpoint, for finding out where is the midpoint
+    // }
+  }
+}
+
+// three functions need to be coded
+void MovingSmoothlyWithPotentiometer(float initialPosition[3], float finalPosition[3]) {
+
+  float x1 = initialPosition[0], y1 = initialPosition[1], z1 = initialPosition[2];
+  float x2 = finalPosition[0], y2 = finalPosition[1], z2 = finalPosition[2];
+
+  movingTheArm(x1, y1, z1); // set the postion to the initialPosition first
+  delay(1000);
+
+  float ratioA = 0.0;
+  float steps = 0.0;
+
+  // float distance = sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1));
+  float displacementVector[] = {(x2-x1), (y2-y1), (z2-z1)};
+  // float vectorFromAToB[] = {0.0, 0.0, 0.0}; 
+
+  while(steps < (1.0 - 0.01)) {
+    steps = 0.97*ratioA + 0.03*1;
+    float vectorFromAToB[] = {(ratioA*displacementVector[0] + x1) ,(ratioA*displacementVector[1] + y1), (ratioA*displacementVector[2] + z1)}; // vector ratio theorem
+    movingTheArm(vectorFromAToB[0], vectorFromAToB[1], vectorFromAToB[2]);
+    Serial.println(vectorFromAToB[0]);
+    ratioA = steps;
+    delay(20);
+    // if (ratioA > 0.5 - 0.01) { // bascially the ideas is for when a=0.5
+    //   delay(10000); // pause at the midpoint, for finding out where is the midpoint
+    // }
+  }
+}
+
+
+void Moving_In_a_Line(float initialPosition[3], float finalPosition[3]) {
+
+  float x1 = initialPosition[0], y1 = initialPosition[1], z1 = initialPosition[2];
+  float x2 = finalPosition[0], y2 = finalPosition[1], z2 = finalPosition[2];
+
+  movingTheArm(x1, y1, z1); // set the postion to the initialPosition first
+  delay(1000);
+
+  float ratioA = 0.0;
+  float steps = 0.0;
+
+  // float distance = sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1));
+  float displacementVector[] = {(x2-x1), (y2-y1), (z2-z1)};
+  // float vectorFromAToB[] = {0.0, 0.0, 0.0}; 
+
+  while(steps < (1.0 - 0.01)) {
+    steps = 0.97*ratioA + 0.03*1;
+    float vectorFromAToB[] = {(ratioA*displacementVector[0] + x1) ,(ratioA*displacementVector[1] + y1), (ratioA*displacementVector[2] + z1)}; // vector ratio theorem
+    movingTheArm(vectorFromAToB[0], vectorFromAToB[1], vectorFromAToB[2]);
+    Serial.println(vectorFromAToB[0]);
+    ratioA = steps;
+    delay(20);
+    // if (ratioA > 0.5 - 0.01) { // bascially the ideas is for when a=0.5
+    //   delay(10000); // pause at the midpoint, for finding out where is the midpoint
+    // }
+  }
+}
+
+
+void Moving_In_a_Line_WithPotentiometer(float initialPosition[3], float finalPosition[3]) {
+
+  float x1 = initialPosition[0], y1 = initialPosition[1], z1 = initialPosition[2];
+  float x2 = finalPosition[0], y2 = finalPosition[1], z2 = finalPosition[2];
+
+  movingTheArm(x1, y1, z1); // set the postion to the initialPosition first
+  delay(1000);
+
+  float ratioA = 0.0;
+  float steps = 0.0;
+
+  // float distance = sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1));
+  float displacementVector[] = {(x2-x1), (y2-y1), (z2-z1)};
+  // float vectorFromAToB[] = {0.0, 0.0, 0.0}; 
+
+  while(steps < (1.0 - 0.01)) {
+    steps = 0.97*ratioA + 0.03*1;
+    float vectorFromAToB[] = {(ratioA*displacementVector[0] + x1) ,(ratioA*displacementVector[1] + y1), (ratioA*displacementVector[2] + z1)}; // vector ratio theorem
+    movingTheArm(vectorFromAToB[0], vectorFromAToB[1], vectorFromAToB[2]);
+    Serial.println(vectorFromAToB[0]);
+    ratioA = steps;
+    delay(20);
+    // if (ratioA > 0.5 - 0.01) { // bascially the ideas is for when a=0.5
+    //   delay(10000); // pause at the midpoint, for finding out where is the midpoint
+    // }
   }
 }
 
@@ -197,17 +276,21 @@ void MovingSmoothly2(float initialPosition[3], float finalPosition[3]) {
 bool init1 = true;
 
 void drawParamatricEquation() {
-  float startingPoint[3] = {100, 0, 30}; // randomly start at a point
+  float startingPoint[3] = {100, 0, 10}; // randomly start at a point
 
   if (init1) { // only run once when first initislise
     movingTheArm(startingPoint[0], startingPoint[1], startingPoint[2]); 
     delay(1000);
   }
-  float t = analogRead(A0); // parameter of a paramatric equation
-  t = map(t, 0, 1023, 0, 50);
+  double t = analogRead(A0); // parameter of a paramatric equation
+  // t = map(t, 0, 1023, 0, 50); // for y=x or y=-x
+  // t = map(t, 0, 1023, -20, 20); // for y=(x*x)/100
+  t = map(t, 0, 1023, 0, 20*Pi);
 
-  movingTheArm(startingPoint[0] + t, 0, startingPoint[2] + t); // equation of y=x
-  // movingTheArm(startingPoint[0] + t, 0, startingPoint[2] + t*t); // equation of y=x*x
+  // movingTheArm(startingPoint[0] + t, 0, startingPoint[2] + t); // equation of y=x
+  // movingTheArm(startingPoint[0] + t, 0, startingPoint[2] - t); // equation of y=-x
+  // movingTheArm(startingPoint[0] + 10*t, 0, startingPoint[2] + t*t); // equation of y=(x*x)/100
+  movingTheArm(startingPoint[0] + 40*cos(t/(2*Pi)), 0, startingPoint[2] + 40*sin(t/(2*Pi))); // equation of y*y + x*x = 40*40
 
   init1 = false;
 }
