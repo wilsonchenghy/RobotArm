@@ -284,13 +284,16 @@ void drawParamatricEquation() {
   }
   double t = analogRead(A0); // parameter of a paramatric equation
   // t = map(t, 0, 1023, 0, 50); // for y=x or y=-x
-  // t = map(t, 0, 1023, -20, 20); // for y=(x*x)/100
-  t = map(t, 0, 1023, 0, 20*Pi);
+  // t = map(t, 0, 1023, -18, 18); // for y=(x*x)/12
+  // t = map(t, 0, 1023, 0, 20*Pi); // for y*y + x*x = 40*40
+  t = map(t, 0, 1023, 2, 14); // for heart
 
   // movingTheArm(startingPoint[0] + t, 0, startingPoint[2] + t); // equation of y=x
   // movingTheArm(startingPoint[0] + t, 0, startingPoint[2] - t); // equation of y=-x
-  // movingTheArm(startingPoint[0] + 10*t, 0, startingPoint[2] + t*t); // equation of y=(x*x)/100
-  movingTheArm(startingPoint[0] + 40*cos(t/(2*Pi)), 0, startingPoint[2] + 40*sin(t/(2*Pi))); // equation of y*y + x*x = 40*40
+  // movingTheArm(startingPoint[0] + 2*t, 0, startingPoint[2] + (t*t)/3); // equation of y=(x*x)/12
+  // movingTheArm(startingPoint[0] + 40*cos(t/(2*Pi)), 0, startingPoint[2] + 40*sin(t/(2*Pi))); // equation of y*y + x*x = 40*40
+  movingTheArm(startingPoint[0] + 4*16*sin(t)*sin(t)*sin(t), 0, startingPoint[2] + 4*(13*cos(t) - 5*cos(2*t) - 2*cos(3*t) - cos(4*t))); // equation of a heart
+
 
   init1 = false;
 }
