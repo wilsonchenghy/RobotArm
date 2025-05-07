@@ -1,3 +1,3 @@
 # RobotArm
 
-Code For My Robot Arm
+Simple 3 DOF Robot Arm
